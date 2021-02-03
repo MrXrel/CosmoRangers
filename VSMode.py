@@ -99,7 +99,7 @@ while running:
         newy = -1
         player1.update(0, newy, 1)
     if keypress[pygame.K_s]:
-        y1 = 1
+        newy = 1
         player1.update(0, newy, 1)
     if keypress[pygame.K_d]:
         newx = 1
