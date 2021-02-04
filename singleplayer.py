@@ -91,7 +91,6 @@ def main():
             for b in player.bullets:
                 b.draw(screen)
             player.draw(screen)
-
             pygame.display.update()
 
         while running:
