@@ -1,11 +1,12 @@
-import pygame
-
 import os
-import sys
+
+import pygame
+pygame.font.init()
+
 
 WIDTH = 700
 HEIGHT = 900
-#
+
 # pictures
 BG = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')), (WIDTH, HEIGHT))
 
@@ -21,7 +22,7 @@ class Bullet:
         self.x = x
         self.y = y
         self.img = img
-        self.speed = 2
+        self.speed = 4
 
     def draw(self, screen):
         screen.blit(self.img, (self.x, self.y))
@@ -75,52 +76,61 @@ class Player(Ship):
 
 
 def main():
-    if __name__ == '__main__':
-        pygame.init()
-        screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        player = Player(300, 600)
-        running = True
-        player_speed = 5
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    player = Player(300, 600)
+    running = True
+    level = 1
+    lives = 5
+    player_speed = 7
+    main_font = pygame.font.SysFont('comicsans', 50)
 
-        clock = pygame.time.Clock()
+    clock = pygame.time.Clock()
 
-        def draw_screen():
-            screen.blit(BG, (0, 0))
+    def draw_screen():
+        screen.blit(BG, (0, 0))
+        lives_label = main_font.render(f'Жизни: {lives}', 1, (255, 255, 255))
+        level_label = main_font.render(f'Уровень: {level}', 1, (255, 255, 255))
 
-            player.reset_reload()
-            for b in player.bullets:
-                b.draw(screen)
-            player.draw(screen)
+        screen.blit(lives_label, (10, 10))
+        screen.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
 
-            pygame.display.update()
+        player.reset_reload()
+        for b in player.bullets:
+            b.draw(screen)
+        player.draw(screen)
 
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+        pygame.display.update()
 
-            # get all pressed keys
-            key_pressed = pygame.key.get_pressed()
-            # up
-            if key_pressed[pygame.K_w] and player.get_height() + player_speed - 5 >= 0:
-                player.y -= player_speed
-            # down
-            if key_pressed[pygame.K_s] and player.get_height() + player_speed + player.img.get_height() <= HEIGHT:
-                player.y += player_speed
-            # left
-            if key_pressed[pygame.K_a] and player.get_width() + player_speed - 5 >= 0:
-                player.x -= player_speed
-            # right
-            if key_pressed[pygame.K_d] and player.get_width() + player_speed + player.img.get_width() <= WIDTH:
-                player.x += player_speed
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-            if key_pressed[pygame.K_SPACE]:
-                player.shoot()
+        # get all pressed keys
+        key_pressed = pygame.key.get_pressed()
+        # up
+        if key_pressed[pygame.K_w] and player.get_height() + player_speed - 5 >= 0:
+            player.y -= player_speed
+        # down
+        if key_pressed[pygame.K_s] and player.get_height() + player_speed + player.img.get_height() <= HEIGHT:
+            player.y += player_speed
+        # left
+        if key_pressed[pygame.K_a] and player.get_width() + player_speed - 5 >= 0:
+            player.x -= player_speed
+        # right
+        if key_pressed[pygame.K_d] and player.get_width() + player_speed + player.img.get_width() <= WIDTH:
+            player.x += player_speed
 
-            for b in player.bullets:
-                b.move()
-            draw_screen()
-            clock.tick(60)
+        if key_pressed[pygame.K_SPACE]:
+            player.shoot()
+
+        for b in player.bullets:
+            b.move()
+        draw_screen()
+        clock.tick(60)
+    pygame.quit()
 
 
-main()
+if __name__ == '__main__':
+    main()
