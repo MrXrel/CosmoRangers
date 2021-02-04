@@ -77,6 +77,7 @@ class Player(Ship):
 
 def main():
     pygame.init()
+    pygame.display.set_caption('Pygame Window')
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     player = Player(300, 600)
     running = True

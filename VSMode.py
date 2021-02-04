@@ -128,6 +128,7 @@ def vs():
             player2.update(newx, 0, 2)
         screen.blit(background, (0, 0))
         all_sprites.draw(screen)
+
         clock.tick(60)
         pygame.display.flip()
     pygame.quit()
