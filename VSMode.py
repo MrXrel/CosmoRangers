@@ -72,6 +72,7 @@ class Border(pygame.sprite.Sprite):
             self.add(vertical_borders)
             self.image = pygame.Surface([1, y2 - y1])
             self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
+            self.image.set_colorkey(pygame.Color('cyan'))
 
         else:  # горизонтальная стенка
             self.add(horizontal_borders)
@@ -80,6 +81,8 @@ class Border(pygame.sprite.Sprite):
 
 
 def vs():
+    global horizontal_borders
+    global vertical_borders
     player1 = Player('ship.png', 0, height / 2, 1)
     player2 = Player('ship.png', width, height // 2, 2)
     all_sprites.add(player1)
@@ -91,6 +94,8 @@ def vs():
     Border(0, 0, 0, height)
     Border(width, 0, width, height)
     Border(width // 2 - 10, 0, width // 2 + 10, height)
+    clock = pygame.time.Clock()
+    player_speed = 3
     running = True
     while running:
         for event in pygame.event.get():
@@ -98,30 +103,32 @@ def vs():
                 running = False
         keypress = pygame.key.get_pressed()
         if keypress[pygame.K_w]:
-            newy = -1
+            newy = -player_speed
             player1.update(0, newy, 1)
         if keypress[pygame.K_s]:
-            newy = 1
+            newy = player_speed
             player1.update(0, newy, 1)
         if keypress[pygame.K_d]:
-            newx = 1
+            newx = player_speed
             player1.update(newx, 0, 1)
         if keypress[pygame.K_a]:
-            newx = -1
+            newx = -player_speed
             player1.update(newx, 0, 1)
         if keypress[pygame.K_UP]:
-            newy = -1
+            newy = -player_speed
             player2.update(0, newy, 2)
         if keypress[pygame.K_DOWN]:
-            newy = 1
+            newy = player_speed
             player2.update(0, newy, 2)
         if keypress[pygame.K_RIGHT]:
-            newx = 1
+            newx = player_speed
             player2.update(newx, 0, 2)
         if keypress[pygame.K_LEFT]:
-            newx = -1
+            newx = -player_speed
             player2.update(newx, 0, 2)
+        screen.blit(background, (0, 0))
         all_sprites.draw(screen)
+        clock.tick(60)
         pygame.display.flip()
     pygame.quit()
 
