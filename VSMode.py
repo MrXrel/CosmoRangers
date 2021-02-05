@@ -135,8 +135,11 @@ def vs():
     Border(0, height, width, height)
     Border(0, 0, 0, height)
     Border(width, 0, width, height)
-    center = Border(width // 2 - 10, 0, width // 2 + 10, height)
-    all_sprites.add(center)
+    pygame.draw.rect(screen, pygame.Color('cyan'), (width // 2 - 5, 0, width // 2 + 5, height))
+    center1 = Border(width // 2 - 5, 0, width // 2 - 5, height)
+    center2 = Border(width // 2 + 5, 0, width // 2 + 5, height)
+    all_sprites.add(center1)
+    all_sprites.add(center2)
     clock = pygame.time.Clock()
     player_speed = 3
     running = True
@@ -172,6 +175,7 @@ def vs():
         screen.blit(background, (0, 0))
         all_sprites.draw(screen)
         clock.tick(60)
+        pygame.draw.rect(screen, pygame.Color('cyan'), (width // 2 - 25, 0, 35, height))
         pygame.display.flip()
     pygame.quit()
 
