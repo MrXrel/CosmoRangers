@@ -7,7 +7,7 @@ import sys
 import pygame
 
 pygame.init()
-size = width, height = 900, 500
+size = width, height = 1000, 600
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("VS Mode Test")
 background = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')), (width, height))
@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         self.bullets = []
         self.damage = 20
         self.reload = 0
-        self.image = pygame.transform.scale(self.image, [100, 83])
+        self.image = pygame.transform.scale(self.image, [67, 55])
         self.rect = self.image.get_rect()
         if num == 1:
             self.rect.topleft = self.x, self.y
