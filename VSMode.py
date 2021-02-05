@@ -7,10 +7,6 @@ import sys
 import pygame
 
 pygame.init()
-size = width, height = 1000, 600
-screen = pygame.display.set_mode(size)
-pygame.display.set_caption("VS Mode Test")
-background = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')), (width, height))
 
 
 def load_image(name, colorkey=None):
@@ -38,16 +34,17 @@ class Player(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.health = 200
-        self.bullets = []
+        self.shots = []
         self.damage = 20
-        self.reload = 0
+        self.cooldown = 0
         self.image = pygame.transform.scale(self.image, [67, 55])
         if num == 1:
-            self.laserim = load_image('pixel_laser_yellow.png')
+            self.laserim = pygame.transform.rotate(load_image('pixel_laser_yellow.png'), 90)
             self.image = pygame.transform.rotate(self.image, 90)
             self.rect = self.image.get_rect()
             self.rect.topleft = self.x, self.y
         elif num == 2:
+            self.laserim = pygame.transform.rotate(load_image('pixel_laser_red.png'), 90)
             self.image = pygame.transform.rotate(self.image, 270)
             self.rect = self.image.get_rect()
             self.rect.topright = self.x, self.y
@@ -73,18 +70,18 @@ class Player(pygame.sprite.Sprite):
                 self.rect.topright = self.x, self.y
 
     def shoot(self):
-        if self.reload == 0:
-            bullet = Bullet(self.x, self.y - self.image.get_height() + 20, self.laserim)
-            self.bullets.append(bullet)
-            self.reload = 1
+        if self.cooldown == 0:
+            shoot = Laser(self.x, self.y - self.image.get_height() + 20, self.laserim)
+            self.shots.append(shoot)
+            self.cooldown = 1
 
     def reset_reload(self):
         # if there is a reload add one every frame
-        if self.reload != 0:
-            self.reload += 1
+        if self.cooldown != 0:
+            self.cooldown += 1
         # if reload > 30, it half a second has passed
-        if self.reload > 30:
-            self.reload = 0
+        if self.cooldown > 30:
+            self.cooldown = 0
 
     def get_height(self):
         return self.y
@@ -109,7 +106,7 @@ class Border(pygame.sprite.Sprite):
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
 
-class Bullet:
+class Laser:
     def __init__(self, x, y, img):
         self.x = x
         self.y = y
@@ -120,10 +117,15 @@ class Bullet:
         screen.blit(self.img, (self.x, self.y))
 
     def move(self):
-        self.y -= self.speed
+        self.x = -self.speed
 
 
 def vs():
+    size = width, height = 1000, 600
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_caption("VS Mode Test")
+    background = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')),
+                                        (width, height))
     global horizontal_borders
     global vertical_borders
     player1 = Player('spaceship_yellow.png', 0, height / 2, 1)
@@ -160,6 +162,8 @@ def vs():
         if keypress[pygame.K_a]:
             newx = -player_speed
             player1.update(newx, 0, 1)
+        if keypress[pygame.K_SPACE]:
+            player1.shoot()
         if keypress[pygame.K_UP]:
             newy = -player_speed
             player2.update(0, newy, 2)
@@ -172,8 +176,20 @@ def vs():
         if keypress[pygame.K_LEFT]:
             newx = -player_speed
             player2.update(newx, 0, 2)
+        if keypress[pygame.K_l]:
+            player2.shoot()
         screen.blit(background, (0, 0))
         all_sprites.draw(screen)
+        for shot in player1.shots:
+            shot.move()
+        for shot in player2.shots:
+            shot.move()
+        player1.reset_reload()
+        player2.reset_reload()
+        for shot in player1.shots:
+            shot.draw(screen)
+        for shot in player2.shots:
+            shot.draw(screen)
         clock.tick(60)
         pygame.draw.rect(screen, pygame.Color('white'), (width // 2 - 1, 0, 5, height))
         pygame.display.flip()
