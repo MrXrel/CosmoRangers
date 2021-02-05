@@ -69,9 +69,9 @@ class Player(pygame.sprite.Sprite):
                 self.x = self.x - x
                 self.rect.topright = self.x, self.y
 
-    def shoot(self):
+    def shoot(self, speed):
         if self.cooldown == 0:
-            shoot = Laser(self.x, self.y - self.image.get_height() + 20, self.laserim)
+            shoot = Laser(self.x, self.y - self.image.get_height() + 20, self.laserim, speed)
             self.shots.append(shoot)
             self.cooldown = 1
 
@@ -107,17 +107,17 @@ class Border(pygame.sprite.Sprite):
 
 
 class Laser:
-    def __init__(self, x, y, img):
+    def __init__(self, x, y, img, speed):
         self.x = x
         self.y = y
         self.img = img
-        self.speed = 4
+        self.speed = speed
 
     def draw(self, screen):
         screen.blit(self.img, (self.x, self.y))
 
     def move(self):
-        self.x = -self.speed
+        self.x += self.speed
 
 
 def vs():
@@ -144,6 +144,7 @@ def vs():
     all_sprites.add(center2)
     clock = pygame.time.Clock()
     player_speed = 3
+    laser_speed = 4
     running = True
     while running:
         for event in pygame.event.get():
@@ -163,7 +164,7 @@ def vs():
             newx = -player_speed
             player1.update(newx, 0, 1)
         if keypress[pygame.K_SPACE]:
-            player1.shoot()
+            player1.shoot(laser_speed)
         if keypress[pygame.K_UP]:
             newy = -player_speed
             player2.update(0, newy, 2)
@@ -177,7 +178,7 @@ def vs():
             newx = -player_speed
             player2.update(newx, 0, 2)
         if keypress[pygame.K_l]:
-            player2.shoot()
+            player2.shoot(-laser_speed)
         screen.blit(background, (0, 0))
         all_sprites.draw(screen)
         for shot in player1.shots:
