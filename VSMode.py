@@ -42,14 +42,15 @@ class Player(pygame.sprite.Sprite):
         self.damage = 20
         self.reload = 0
         self.image = pygame.transform.scale(self.image, [67, 55])
-        self.rect = self.image.get_rect()
         if num == 1:
-            self.rect.topleft = self.x, self.y
             self.laserim = load_image('pixel_laser_yellow.png')
             self.image = pygame.transform.rotate(self.image, 90)
+            self.rect = self.image.get_rect()
+            self.rect.topleft = self.x, self.y
         elif num == 2:
-            self.rect.topright = self.x, self.y
             self.image = pygame.transform.rotate(self.image, 270)
+            self.rect = self.image.get_rect()
+            self.rect.topright = self.x, self.y
 
     def update(self, x, y, num):
         self.x = self.x + x
@@ -135,9 +136,8 @@ def vs():
     Border(0, height, width, height)
     Border(0, 0, 0, height)
     Border(width, 0, width, height)
-    pygame.draw.rect(screen, pygame.Color('cyan'), (width // 2 - 5, 0, width // 2 + 5, height))
-    center1 = Border(width // 2 - 5, 0, width // 2 - 5, height)
-    center2 = Border(width // 2 + 5, 0, width // 2 + 5, height)
+    center1 = Border(width // 2 - 1, 0, width // 2 - 1, height)
+    center2 = Border(width // 2 + 1, 0, width // 2 + 1, height)
     all_sprites.add(center1)
     all_sprites.add(center2)
     clock = pygame.time.Clock()
@@ -175,7 +175,7 @@ def vs():
         screen.blit(background, (0, 0))
         all_sprites.draw(screen)
         clock.tick(60)
-        pygame.draw.rect(screen, pygame.Color('cyan'), (width // 2 - 25, 0, 35, height))
+        pygame.draw.rect(screen, pygame.Color('white'), (width // 2 - 1, 0, 5, height))
         pygame.display.flip()
     pygame.quit()
 
