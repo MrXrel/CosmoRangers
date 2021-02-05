@@ -1,8 +1,9 @@
 import os
+import random
 
 import pygame
-pygame.font.init()
 
+pygame.font.init()
 
 WIDTH = 700
 HEIGHT = 900
@@ -12,9 +13,16 @@ BG = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background
 
 # ships
 PLAYER_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_yellow.png'))
+# enemy ships
+BLUE_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_blue_small.png'))
+RED_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_red_small.png'))
+GREEN_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_green_small.png'))
 
 # Bullets
 YELLOW_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_yellow.png'))
+BLUE_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_blue.png'))
+RED_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_red.png'))
+GREEN_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_green.png'))
 
 
 class Bullet:
@@ -75,16 +83,48 @@ class Player(Ship):
         self.bullet_img = YELLOW_BULLET
 
 
+class Enemy(Ship):
+    types_of_ships = {
+        'red': [RED_SHIP, RED_BULLET],
+        'blue': [BLUE_SHIP, BLUE_BULLET],
+        'green': [GREEN_SHIP, GREEN_BULLET]
+
+    }
+
+    def __init__(self, x, y, color, health=100):
+        super().__init__(x, y, health)
+        ship = self.types_of_ships[color]
+        self.img = ship[0]
+        self.bullet_img = ship[1]
+
+    def move(self, speed):
+        self.y += speed
+
+
 def main():
     pygame.init()
-    pygame.display.set_caption('Pygame Window')
+    pygame.display.set_caption('SinglePlayer')
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     player = Player(300, 600)
     running = True
-    level = 1
+    level = 0
     lives = 5
+    wave = 0
+    enemies = []
+
     player_speed = 7
+    enemy_speed = 2
+
     main_font = pygame.font.SysFont('comicsans', 50)
+
+    if len(enemies) == 0:
+        level += 1
+        wave += 5
+        for i in range(wave):
+            enemy = Enemy(random.randint(100, WIDTH - 100),
+                          random.randint(-1000, -50),
+                          random.choice(['red', 'green', 'blue']))
+            enemies.append(enemy)
 
     clock = pygame.time.Clock()
 
@@ -92,13 +132,20 @@ def main():
         screen.blit(BG, (0, 0))
         lives_label = main_font.render(f'Жизни: {lives}', 1, (255, 255, 255))
         level_label = main_font.render(f'Уровень: {level}', 1, (255, 255, 255))
-
+        # draw labels
         screen.blit(lives_label, (10, 10))
         screen.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
 
+        # draw enemies
+        for enemy in enemies:
+            enemy.draw(screen)
+
+        # reset reload
         player.reset_reload()
+        # draw bullets
         for b in player.bullets:
             b.draw(screen)
+        # draw a player
         player.draw(screen)
 
         pygame.display.update()
@@ -126,8 +173,13 @@ def main():
         if key_pressed[pygame.K_SPACE]:
             player.shoot()
 
+        # move bullets
         for b in player.bullets:
             b.move()
+
+        # move enemies
+        for e in enemies:
+            e.move(enemy_speed)
         draw_screen()
         clock.tick(60)
     pygame.quit()
