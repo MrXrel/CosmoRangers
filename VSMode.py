@@ -33,26 +33,27 @@ class Player(pygame.sprite.Sprite):
         self.image = load_image(image)
         self.x = x
         self.y = y
+        self.num = num
         self.health = 200
         self.shots = []
         self.damage = 20
         self.cooldown = 0
         self.image = pygame.transform.scale(self.image, [67, 55])
-        if num == 1:
+        if self.num == 1:
             self.laserim = pygame.transform.rotate(load_image('pixel_laser_yellow.png'), 90)
             self.image = pygame.transform.rotate(self.image, 90)
             self.rect = self.image.get_rect()
             self.rect.topleft = self.x, self.y
-        elif num == 2:
+        elif self.num == 2:
             self.laserim = pygame.transform.rotate(load_image('pixel_laser_red.png'), 90)
             self.image = pygame.transform.rotate(self.image, 270)
             self.rect = self.image.get_rect()
             self.rect.topright = self.x, self.y
 
-    def update(self, x, y, num):
+    def update(self, x, y):
         self.x = self.x + x
         self.y = self.y + y
-        if num == 1:
+        if self.num == 1:
             self.rect.topleft = self.x, self.y
             if pygame.sprite.spritecollideany(self, horizontal_borders):
                 self.y = self.y - y
@@ -60,7 +61,7 @@ class Player(pygame.sprite.Sprite):
             if pygame.sprite.spritecollideany(self, vertical_borders):
                 self.x = self.x - x
                 self.rect.topleft = self.x, self.y
-        elif num == 2:
+        elif self.num == 2:
             self.rect.topright = self.x, self.y
             if pygame.sprite.spritecollideany(self, horizontal_borders):
                 self.y = self.y - y
@@ -71,7 +72,10 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self, speed):
         if self.cooldown == 0:
-            shoot = Laser(self.x, self.y - self.image.get_height() + 20, self.laserim, speed)
+            if self.num == 1:
+                shoot = Laser(self.x, self.y - self.image.get_height() + 50, self.laserim, speed)
+            elif self.num == 2:
+                shoot = Laser(self.x - 80, self.y - self.image.get_height() + 50, self.laserim, speed)
             self.shots.append(shoot)
             self.cooldown = 1
 
@@ -80,7 +84,7 @@ class Player(pygame.sprite.Sprite):
         if self.cooldown != 0:
             self.cooldown += 1
         # if reload > 30, it half a second has passed
-        if self.cooldown > 30:
+        if self.cooldown > 15:
             self.cooldown = 0
 
     def get_height(self):
@@ -122,14 +126,17 @@ class Laser:
 
 def vs():
     size = width, height = 1000, 600
+    font = pygame.font.SysFont('spacecur', 45)
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("VS Mode Test")
     background = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')),
                                         (width, height))
     global horizontal_borders
     global vertical_borders
-    player1 = Player('spaceship_yellow.png', 0, height / 2, 1)
-    player2 = Player('spaceship_red.png', width, height // 2, 2)
+    player1 = Player('spaceship_yellow.png', 25, height // 2 - 50, 1)
+    player2 = Player('spaceship_red.png', width - 25, height // 2 - 50, 2)
+    p1hp = font.render(f"Здоровье: {player1.health}", False, pygame.Color('white'))
+    p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
     all_sprites.add(player1)
     all_sprites.add(player2)
     horizontal_borders = pygame.sprite.Group()
@@ -153,33 +160,35 @@ def vs():
         keypress = pygame.key.get_pressed()
         if keypress[pygame.K_w]:
             newy = -player_speed
-            player1.update(0, newy, 1)
+            player1.update(0, newy)
         if keypress[pygame.K_s]:
             newy = player_speed
-            player1.update(0, newy, 1)
+            player1.update(0, newy)
         if keypress[pygame.K_d]:
             newx = player_speed
-            player1.update(newx, 0, 1)
+            player1.update(newx, 0)
         if keypress[pygame.K_a]:
             newx = -player_speed
-            player1.update(newx, 0, 1)
+            player1.update(newx, 0)
         if keypress[pygame.K_SPACE]:
             player1.shoot(laser_speed)
         if keypress[pygame.K_UP]:
             newy = -player_speed
-            player2.update(0, newy, 2)
+            player2.update(0, newy)
         if keypress[pygame.K_DOWN]:
             newy = player_speed
-            player2.update(0, newy, 2)
+            player2.update(0, newy)
         if keypress[pygame.K_RIGHT]:
             newx = player_speed
-            player2.update(newx, 0, 2)
+            player2.update(newx, 0)
         if keypress[pygame.K_LEFT]:
             newx = -player_speed
-            player2.update(newx, 0, 2)
-        if keypress[pygame.K_l]:
+            player2.update(newx, 0)
+        if keypress[pygame.K_RCTRL]:
             player2.shoot(-laser_speed)
         screen.blit(background, (0, 0))
+        screen.blit(p1hp, (25, 10))
+        screen.blit(p2hp, (750, 10))
         all_sprites.draw(screen)
         for shot in player1.shots:
             shot.move()
