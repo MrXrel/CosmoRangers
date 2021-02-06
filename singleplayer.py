@@ -26,11 +26,11 @@ GREEN_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_green.png')
 
 
 class Bullet:
-    def __init__(self, x, y, img):
+    def __init__(self, x, y, img, speed=4):
         self.x = x
         self.y = y
         self.img = img
-        self.speed = 4
+        self.speed = speed
         self.mask = pygame.mask.from_surface(self.img)
 
     def draw(self, screen):
@@ -108,23 +108,40 @@ class Enemy(Ship):
 
     }
 
-    def __init__(self, x, y, color, health=100):
+    def __init__(self, x, y, color, bullet_speed, health=100):
         super().__init__(x, y, health)
         ship = self.types_of_ships[color]
         self.img = ship[0]
         self.bullet_img = ship[1]
+        self.speed = bullet_speed
         self.mask = pygame.mask.from_surface(self.img)
 
-    def move(self, speed):
+    def move(self, speed: int):
         self.y += speed
 
+    def shoot_(self, enemy_bullets: list):
+        # check if enemy is on the screen
+        if self.y + self.img.get_height() >= 1:
+            if self.reload == 0:
+                bullet = Bullet(self.x, self.y - self.img.get_height() + 20, self.bullet_img, self.speed)
+                enemy_bullets.append(bullet)
+                self.reload = 1
 
-def collide(bullet, ship):
+    def reset_reload(self):
+        # if there is a reload add one every frame
+        if self.reload != 0:
+            self.reload += 1
+        # if reload > 30, it half a second has passed
+        if self.reload > 70:
+            self.reload = 0
+
+
+def collide(bullet, ship) -> bool:
+    """Return if objects overlap each other"""
     return bullet.mask.overlap(ship.mask, (ship.x - bullet.x, ship.y - bullet.y))
 
 
 def main():
-    global player
     pygame.init()
     pygame.display.set_caption('SinglePlayer')
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -134,12 +151,14 @@ def main():
     lives = 5
     wave = 3
     enemies = []
+    enemy_bullets = []
 
     player_speed = 7
     enemy_speed = 1
 
-    main_font = pygame.font.SysFont('comicsans', 50)
+    enemy_bullet_speed = -4
 
+    main_font = pygame.font.SysFont('comicsans', 50)
 
     clock = pygame.time.Clock()
 
@@ -154,12 +173,18 @@ def main():
         # draw enemies
         for enemy in enemies:
             enemy.draw(screen)
+            enemy.reset_reload()
 
         # reset reload
         player.reset_reload()
         # draw bullets
         for b in player.bullets:
             b.draw(screen)
+
+        # draw enemy bullets
+        for b in enemy_bullets:
+            b.draw(screen)
+
         # draw a player
         player.draw(screen)
 
@@ -176,7 +201,8 @@ def main():
             for i in range(wave):
                 enemy = Enemy(random.randrange(50, WIDTH - 100),
                               random.randrange(-1000, -50),
-                              random.choice(['red', 'green', 'blue']))
+                              random.choice(['red', 'green', 'blue']),
+                              enemy_bullet_speed)
                 enemies.append(enemy)
 
         # get all pressed keys
@@ -194,11 +220,16 @@ def main():
         if key_pressed[pygame.K_d] and player.get_width() + player_speed + player.img.get_width() <= WIDTH:
             player.x += player_speed
 
-        if key_pressed[pygame.K_SPACE]:
-            if level >= 10:
-                player.advanced_shoot()
-            else:
-                player.shoot()
+        # if key_pressed[pygame.K_SPACE]:
+        #     if level >= 10:
+        #         player.advanced_shoot()
+        #     else:
+        #         player.shoot()
+
+        if level >= 10:
+            player.advanced_shoot()
+        else:
+            player.shoot()
 
         # move bullets
         for b in player.bullets[:]:
@@ -206,6 +237,17 @@ def main():
             # check if bullets is out of the screen
             if b.y + b.img.get_height() <= 0:
                 player.bullets.remove(b)
+        # move enemy bullets
+        for b in enemy_bullets[:]:
+            b.move()
+            # if bullet catch the player
+            if collide(b, player):
+                enemy_bullets.remove(b)
+                lives -= 1
+            # if out of the screen
+            if b.y - b.img.get_height() >= HEIGHT:
+                print('b')
+                enemy_bullets.remove(b)
 
         # check if bullet catch the enemy
         for enemy in enemies[:]:
@@ -217,13 +259,24 @@ def main():
                         player.bullets.remove(b)
                     except ValueError:
                         pass
+            # check if enemy touch the player
+            if collide(enemy, player):
+                try:
+                    enemies.remove(enemy)
+                    lives -= 1
+                except ValueError:
+                    pass
 
         # move enemies
         for e in enemies[:]:
             e.move(enemy_speed)
+            # check if they touch the screen
             if e.y + e.img.get_height() >= HEIGHT:
                 enemies.remove(e)
                 lives -= 1
+            # shoot
+            if not random.randrange(0, 1000):
+                e.shoot_(enemy_bullets)
         draw_screen()
         clock.tick(60)
     pygame.quit()
