@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         self.num = num
         self.health = 200
         self.shots = []
-        self.damage = 20
+        self.damage = 40
         self.cooldown = 0
         self.image = pygame.transform.scale(self.image, [67, 55])
         if self.num == 1:
@@ -49,6 +49,7 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.rotate(self.image, 270)
             self.rect = self.image.get_rect()
             self.rect.topright = self.x, self.y
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, x, y):
         self.x = self.x + x
@@ -73,17 +74,15 @@ class Player(pygame.sprite.Sprite):
     def shoot(self, speed):
         if self.cooldown == 0:
             if self.num == 1:
-                shoot = Laser(self.x, self.y - self.image.get_height() + 50, self.laserim, speed)
+                bang = Laser(self.x, self.y - self.image.get_height() + 50, self.laserim, speed)
             elif self.num == 2:
-                shoot = Laser(self.x - 80, self.y - self.image.get_height() + 50, self.laserim, speed)
-            self.shots.append(shoot)
+                bang = Laser(self.x - 80, self.y - self.image.get_height() + 50, self.laserim, speed)
+            self.shots.append(bang)
             self.cooldown = 1
 
     def reset_reload(self):
-        # if there is a reload add one every frame
         if self.cooldown != 0:
             self.cooldown += 1
-        # if reload > 30, it half a second has passed
         if self.cooldown > 15:
             self.cooldown = 0
 
@@ -114,14 +113,25 @@ class Laser:
     def __init__(self, x, y, img, speed):
         self.x = x
         self.y = y
-        self.img = img
+        self.image = img
         self.speed = speed
+        self.mask = pygame.mask.from_surface(self.image)
 
     def draw(self, screen):
-        screen.blit(self.img, (self.x, self.y))
+        screen.blit(self.image, (self.x, self.y))
 
     def move(self):
         self.x += self.speed
+
+    def get_height(self):
+        return self.y
+
+    def get_width(self):
+        return self.x
+
+
+def collide(shot, ship) -> bool:
+    return shot.mask.overlap(ship.mask, (ship.x - shot.x, ship.y - shot.y))
 
 
 def vs():
@@ -135,8 +145,6 @@ def vs():
     global vertical_borders
     player1 = Player('spaceship_yellow.png', 25, height // 2 - 50, 1)
     player2 = Player('spaceship_red.png', width - 25, height // 2 - 50, 2)
-    p1hp = font.render(f"Здоровье: {player1.health}", False, pygame.Color('white'))
-    p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
     all_sprites.add(player1)
     all_sprites.add(player2)
     horizontal_borders = pygame.sprite.Group()
@@ -187,13 +195,25 @@ def vs():
         if keypress[pygame.K_RCTRL]:
             player2.shoot(-laser_speed)
         screen.blit(background, (0, 0))
+        p1hp = font.render(f"Здоровье: {player1.health}", False, pygame.Color('white'))
+        p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
         screen.blit(p1hp, (25, 10))
         screen.blit(p2hp, (750, 10))
         all_sprites.draw(screen)
         for shot in player1.shots:
             shot.move()
+            if collide(shot, player2):
+                player1.shots.remove(shot)
+                player2.health -= player1.damage
+            if shot.x - shot.image.get_width() >= width:
+                player1.shots.remove(shot)
         for shot in player2.shots:
             shot.move()
+            if collide(shot, player1):
+                player2.shots.remove(shot)
+                player1.health -= player2.damage
+            if shot.x - shot.image.get_width() == 0:
+                player2.shots.remove(shot)
         player1.reset_reload()
         player2.reset_reload()
         for shot in player1.shots:
