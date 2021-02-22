@@ -9,13 +9,20 @@ import pygame
 pygame.init()
 
 
-def load_image(name, colorkey=None):
+def load_image(name, colorkey=-1):
     fullname = os.path.join('Assets', name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
     image = pygame.image.load(fullname)
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
     return image
 
 
@@ -28,9 +35,13 @@ all_sprites = pygame.sprite.Group()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, image, x, y, num):
+    def __init__(self, image, x, y, num, col, row, width, height):
         super().__init__(all_sprites)
-        self.image = load_image(image)
+        self.frames = []
+        self.sprite(load_image(image), col, row)
+        self.spritecur = 0
+        self.image = self.frames[self.spritecur]
+        self.srect = self.srect.move(width, height)
         self.x = x
         self.y = y
         self.num = num
@@ -38,7 +49,7 @@ class Player(pygame.sprite.Sprite):
         self.shots = []
         self.damage = 40
         self.cooldown = 0
-        self.image = pygame.transform.scale(self.image, [67, 55])
+        self.image = pygame.transform.scale(self.image, [60, 77])
         if self.num == 1:
             self.laserim = pygame.transform.rotate(load_image('pixel_laser_yellow.png'), 90)
             self.image = pygame.transform.rotate(self.image, 90)
@@ -50,6 +61,15 @@ class Player(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.topright = self.x, self.y
         self.mask = pygame.mask.from_surface(self.image)
+
+    def sprite(self, image, col, row):
+        self.srect = pygame.Rect(0, 0, image.get_width() // col,
+                                image.get_height() // row)
+        for j in range(row):
+            for i in range(col):
+                frame = (self.srect.w * i, self.srect.h * j)
+                self.frames.append(image.subsurface(pygame.Rect(
+                    frame, self.srect.size)))
 
     def update(self, x, y):
         self.x = self.x + x
@@ -71,12 +91,21 @@ class Player(pygame.sprite.Sprite):
                 self.x = self.x - x
                 self.rect.topright = self.x, self.y
 
+    def framechange(self):
+        self.spritecur = (self.spritecur + 1) % len(self.frames)
+        self.image = self.frames[self.spritecur]
+        self.image = pygame.transform.scale(self.image, [60, 77])
+        if self.num == 1:
+            self.image = pygame.transform.rotate(self.image, 90)
+        elif self.num == 2:
+            self.image = pygame.transform.rotate(self.image, 270)
+
     def shoot(self, speed):
         if self.cooldown == 0:
             if self.num == 1:
-                bang = Laser(self.x, self.y - self.image.get_height() + 50, self.laserim, speed)
+                bang = Laser(self.x + 30, self.y - self.image.get_height() + 39, self.laserim, speed)
             elif self.num == 2:
-                bang = Laser(self.x - 80, self.y - self.image.get_height() + 50, self.laserim, speed)
+                bang = Laser(self.x - 120, self.y - self.image.get_height() + 39, self.laserim, speed)
             self.shots.append(bang)
             self.cooldown = 1
 
@@ -91,6 +120,12 @@ class Player(pygame.sprite.Sprite):
 
     def get_width(self):
         return self.x
+
+    def damage(self):
+        pass
+
+    def death(self):
+        pass
 
 
 class Border(pygame.sprite.Sprite):
@@ -136,15 +171,15 @@ def collide(shot, ship) -> bool:
 
 def vs():
     size = width, height = 1000, 600
-    font = pygame.font.SysFont('spacecur', 45)
+    font = pygame.font.SysFont('data/SpaceCur', 45)
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("VS Mode Test")
     background = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')),
                                         (width, height))
     global horizontal_borders
     global vertical_borders
-    player1 = Player('spaceship_yellow.png', 25, height // 2 - 50, 1)
-    player2 = Player('spaceship_red.png', width - 25, height // 2 - 50, 2)
+    player1 = Player('Ships/Flying/BLUEVOYAGERSHEET.png', 25, height // 2 - 50, 1, 4, 1, 40, 57)
+    player2 = Player('Ships/Flying/REDVOYAGERSHEET.png', width - 25, height // 2 - 50, 2, 4, 1, 50, 50)
     all_sprites.add(player1)
     all_sprites.add(player2)
     horizontal_borders = pygame.sprite.Group()
@@ -199,6 +234,8 @@ def vs():
         p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
         screen.blit(p1hp, (25, 10))
         screen.blit(p2hp, (750, 10))
+        player1.framechange()
+        player2.framechange()
         all_sprites.draw(screen)
         for shot in player1.shots:
             shot.move()
