@@ -8,12 +8,13 @@ HEIGHT = 900
 BG = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')), (WIDTH, HEIGHT))
 
 # ships
-PLAYER_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_yellow.png'))
+PLAYER_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'PLAYERSHIP1.png'))
 # enemy ships
-BLUE_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_blue_small.png'))
-RED_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_red_small.png'))
-GREEN_SHIP = pygame.image.load(os.path.join('Assets', 'pixel_ship_green_small.png'))
-
+RED_BIG_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'REDVOYAGERSHEET1.png'))
+BLUE_BIG_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'BLUEVOYAGERSHEET1.png'))
+PURPLE_SMALL_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'PURPLEFALCONSHEET1.png'))
+BLUE_SMALL_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'BLUEFALCONSHEET1.png'))
+RED_SMALL_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'REDFALCONSHEET1.png'))
 # Bullets
 YELLOW_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_yellow.png'))
 BLUE_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_blue.png'))

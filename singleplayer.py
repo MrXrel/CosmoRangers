@@ -1,12 +1,12 @@
 import random
 
 from classes import *
-from images import BG
+from images import BG, PLAYER_SHIP
 from spawn_enemies import *
 
 import pygame
-pygame.font.init()
 
+pygame.font.init()
 
 WIDTH = 700
 HEIGHT = 900
@@ -21,7 +21,8 @@ def main():
     pygame.init()
     pygame.display.set_caption('SinglePlayer')
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    player = Player(300, 600)
+
+    player = Player(300, 600, PLAYER_SHIP, 4, 1, (94, 100))
     running = True
     level = 0
     lives = 5
@@ -48,11 +49,14 @@ def main():
 
         # draw enemies
         for enemy in enemies:
+            enemy.update_sprite()
             enemy.draw(screen)
             enemy.reset_reload()
 
         # reset reload
         player.reset_reload()
+        # refresh player sprite
+        player.update_sprite()
         # draw bullets
         for b in player.bullets:
             b.draw(screen)
@@ -122,7 +126,6 @@ def main():
             if b.y - b.img.get_height() >= HEIGHT:
                 print('b')
                 enemy_bullets.remove(b)
-        # lives = move_enemy_bullets(enemy_bullets, lives, player)
 
         # check if bullet catch the enemy
         for enemy in enemies[:]:

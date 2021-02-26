@@ -1,6 +1,8 @@
 from images import *
 import pygame
 
+all_sprites = pygame.sprite.Group()
+
 
 class Bullet:
     def __init__(self, x, y, img, speed=4):
@@ -20,15 +22,24 @@ class Bullet:
     #     return self.img.get_rect().colliderect(other.img.get_rect())
 
 
-class Ship:
-    def __init__(self, x, y, health=100):
+class Ship(pygame.sprite.Sprite):
+    def __init__(self, x: int, y: int, sheet, columns: int, rows: int, size: tuple, health=100):
+        super().__init__(all_sprites)
         self.x = x
         self.y = y
+        self.frames = []
+        self.sheet = sheet
+        transColor = self.sheet.get_at((0, 0))
+        self.sheet.set_colorkey(transColor)
+        self.cut_sheet(self.sheet, columns, rows)
+        self.cur_frame = 0
         self.health = health
         self.img = None
         self.bullet_img = None
-        # bullets which were shot by this ship
+        self.size = size
+        self.rect = self.rect.move(x, y)
 
+        # bullets which were shot by this ship
         self.bullets = []
         self.damage = 20
         self.reload = 0
@@ -57,13 +68,24 @@ class Ship:
     def get_width(self):
         return self.x
 
-    # def collide_with(self, other):
-    #     return self.img.get_rect().colliderect(other.img.get_rect())
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update_sprite(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.img = pygame.transform.scale(self.frames[self.cur_frame], self.size)
+        self.mask = pygame.mask.from_surface(self.img)
 
 
 class Player(Ship):
-    def __init__(self, x, y, health=100):
-        super().__init__(x, y, health)
+    def __init__(self, x, y, sheet, columns, rows, size, health=100):
+        super().__init__(x, y, sheet, columns, rows, size)
         self.img = PLAYER_SHIP
         self.bullet_img = YELLOW_BULLET
         self.mask = pygame.mask.from_surface(self.img)
@@ -78,19 +100,13 @@ class Player(Ship):
 
 
 class Enemy(Ship):
-    types_of_ships = {
-        'red': [RED_SHIP, RED_BULLET],
-        'blue': [BLUE_SHIP, BLUE_BULLET],
-        'green': [GREEN_SHIP, GREEN_BULLET]
+    def __init__(self, x, y, bullet_speed, ship, columns, rows, size, health=100):
+        sheet = ship[0]
 
-    }
+        super().__init__(x, y, sheet, columns, rows, size)
 
-    def __init__(self, x, y, color, bullet_speed, health=100):
-        super().__init__(x, y, health)
-        ship = self.types_of_ships[color]
         self.img = ship[0]
         self.bullet_img = ship[1]
-
         self.speed = bullet_speed
         self.mask = pygame.mask.from_surface(self.img)
 
