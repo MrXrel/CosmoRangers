@@ -126,6 +126,7 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.rotate(self.image, 90)
         elif self.num == 2:
             self.image = pygame.transform.rotate(self.image, 270)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def shoot(self, speed):
         if self.cooldown == 0:
@@ -139,7 +140,7 @@ class Player(pygame.sprite.Sprite):
     def reset_reload(self):
         if self.cooldown != 0:
             self.cooldown += 1
-        if self.cooldown > 15:
+        if self.cooldown > 30:
             self.cooldown = 0
 
     def get_height(self):
@@ -177,7 +178,7 @@ class Border(pygame.sprite.Sprite):
         else:  # горизонтальная стенка
             self.add(horizontal_borders)
             self.image = pygame.Surface([x2 - x1, 1])
-            self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
+        self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
 
 class Rocket:
@@ -214,6 +215,7 @@ class Rocket:
         self.spritecur = (self.spritecur + 1) % len(self.frames)
         self.image = pygame.transform.scale(self.image, [22, 58])
         self.image = pygame.transform.rotate(self.image, self.rotate)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def get_height(self):
         return self.y
@@ -223,7 +225,7 @@ class Rocket:
 
 
 def collide(shot, ship) -> bool:
-    return shot.mask.overlap(ship.mask, (ship.x - shot.x, ship.y - shot.y))
+    return shot.mask.overlap(ship.mask, (shot.x - ship.x, shot.y - ship.y))
 
 
 def vs():
