@@ -118,7 +118,7 @@ class Enemy(Ship):
         if self.y + self.img.get_height() >= 1:
             if self.reload == 0:
                 # TODO right shoot animation from center of the bot
-                bullet = Bullet(self.x - (self.img.get_width() // 2) // 2, self.y - self.img.get_height() + 20, self.bullet_img, self.speed)
+                bullet = Bullet(self.x + (self.img.get_width() // 2), self.y + self.img.get_height(), self.bullet_img, self.speed)
                 enemy_bullets.append(bullet)
                 self.reload = 1
 
