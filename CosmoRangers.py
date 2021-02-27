@@ -50,12 +50,18 @@ class Menu(arcade.View):
         self.ui.add_ui_element(exitbtn)
 
     def arcstart(self):
-        scene = main()
-        self.window.show_view(scene)
+        try:
+            scene = main()
+            self.window.show_view(scene)
+        except ValueError:
+            pass
 
     def vsstart(self):
-        scene = vs()
-        self.window.show_view(scene)
+        try:
+            scene = vs()
+            self.window.show_view(scene)
+        except ValueError:
+            pass
 
     def exit(self):
         arcade.close_window()
