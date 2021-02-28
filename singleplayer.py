@@ -96,13 +96,13 @@ def main():
             # get all pressed keys
             key_pressed = pygame.key.get_pressed()
             # up
-            if key_pressed[pygame.K_w] and player.get_height() + player_speed - 5 >= 0:
+            if key_pressed[pygame.K_w] and player.get_height() + player_speed - 15 >= 0:
                 player.y -= player_speed
             # down
             if key_pressed[pygame.K_s] and player.get_height() + player_speed + player.img.get_height() <= HEIGHT:
                 player.y += player_speed
             # left
-            if key_pressed[pygame.K_a] and player.get_width() + player_speed - 5 >= 0:
+            if key_pressed[pygame.K_a] and player.get_width() + player_speed - 10 >= 0:
                 player.x -= player_speed
             # right
             if key_pressed[pygame.K_d] and player.get_width() + player_speed + player.img.get_width() <= WIDTH:
