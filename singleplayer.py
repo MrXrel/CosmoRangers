@@ -24,7 +24,7 @@ def main():
     player = Player(300, 600, PLAYER_SHIP, 4, 1, (94, 100))
     running = True
     level = 0
-    lives = 1
+    lives = 5
     wave = 3
     enemies = []
     enemy_bullets = []
@@ -72,8 +72,10 @@ def main():
 
         # draw a player
         player.draw(screen)
+
         screen.blit(lives_label, (10, 10))
         screen.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
+
         pygame.display.update()
 
     while running:
@@ -167,6 +169,7 @@ def main():
                 alive = False
             draw_screen()
             clock.tick(60)
+
         elif not alive:
             death_label = death_font.render('Вы проиграли', 1, (255, 255, 255))
             screen.blit(death_label,
@@ -174,6 +177,7 @@ def main():
             pygame.display.update()
             pygame.time.wait(3000)
             main()
+            
         elif paused and alive:
             pause_label = pause_font.render('Пауза', 1, (255, 255, 255))
             screen.blit(pause_label, (WIDTH // 2 - pause_label.get_width() // 2, HEIGHT // 2 - pause_label.get_height() // 2))
