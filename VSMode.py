@@ -141,7 +141,7 @@ class Player(pygame.sprite.Sprite):
     def reset_reload(self):
         if self.cooldown != 0:
             self.cooldown += 1
-        if self.cooldown > 30:
+        if self.cooldown > 15:
             self.cooldown = 0
 
     def get_height(self):
@@ -251,9 +251,9 @@ def vs():
     Border(0, 0, width, 0)
     Border(0, height, width, height)
     Border(0, 0, 0, height)
-    Border(width, 0, width, height)
-    center1 = Border(width // 2 - 1, 0, width // 2 - 1, height)
-    center2 = Border(width // 2 + 1, 0, width // 2 + 1, height)
+    Border(width + 20, 0, width + 20, height)
+    center1 = Border(width // 2, 0, width // 2, height)
+    center2 = Border(width // 2, 0, width // 2, height)
     all_sprites.add(center1)
     all_sprites.add(center2)
     clock = pygame.time.Clock()
@@ -299,8 +299,7 @@ def vs():
             if keypress[pygame.K_ESCAPE]:
                 running = False
             if keypress[pygame.K_r]:
-                player1 = Player('Ships/Flying/BLUEVOYAGERSHEET.png', 25, height // 2 - 50, 1, 4, 1)
-                player2 = Player('Ships/Flying/REDVOYAGERSHEET.png', width - 25, height // 2 - 50, 2, 4, 1)
+                vs()
         screen.blit(background, (0, 0))
         p1hp = font.render(f"Здоровье: {player1.health}", False, pygame.Color('white'))
         p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
@@ -339,8 +338,8 @@ def vs():
         all_sprites.draw(screen)
         screen.blit(p1hp, (20, 10))
         screen.blit(p2hp, (680, 10))
+        pygame.draw.rect(screen, pygame.Color('dark blue'), (width // 2 - 1, 0, 5, height))
         if player2.dtrigger:
-            pygame.draw.rect(screen, pygame.Color(0, 0, 0, 25), (0, 0, width, height))
             victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
             cont = font.render('Нажмите "ESC", чтобы выйти', False,
                                pygame.Color('white'))
@@ -358,8 +357,7 @@ def vs():
             screen.blit(victory, (150, height / 2 - 200))
             screen.blit(cont, (150, height / 2 - 100))
             screen.blit(cont2, (150, height / 2))
-        clock.tick(60)
-        pygame.draw.rect(screen, pygame.Color('white'), (width // 2 - 1, 0, 5, height))
+        clock.tick(30)
         pygame.display.flip()
     pygame.quit()
     from CosmoRangers import start
