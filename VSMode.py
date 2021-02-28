@@ -294,6 +294,12 @@ def vs():
                 player2.update(newx, 0)
             if keypress[pygame.K_RCTRL]:
                 player2.shoot(-rocket_speed)
+        if player1.dtrigger or player2.dtrigger:
+            if keypress[pygame.K_ESCAPE]:
+                running = False
+            if keypress[pygame.K_r]:
+                player1 = Player('Ships/Flying/BLUEVOYAGERSHEET.png', 25, height // 2 - 50, 1, 4, 1)
+                player2 = Player('Ships/Flying/REDVOYAGERSHEET.png', width - 25, height // 2 - 50, 2, 4, 1)
         screen.blit(background, (0, 0))
         p1hp = font.render(f"Здоровье: {player1.health}", False, pygame.Color('white'))
         p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
@@ -332,10 +338,25 @@ def vs():
         all_sprites.draw(screen)
         screen.blit(p1hp, (20, 10))
         screen.blit(p2hp, (680, 10))
-        if player1.dtrigger:
+        if player2.dtrigger:
+            pygame.draw.rect(screen, pygame.Color(0, 0, 0, 25), (0, 0, width, height))
             victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
-            cont = font.render('Нажмите "ESC", чтобы выйти\nНажмите "R", чтобы перезапустить', False,
+            cont = font.render('Нажмите "ESC", чтобы выйти', False,
                                pygame.Color('white'))
+            cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
+                               pygame.Color('white'))
+            screen.blit(victory, (150, height / 2 - 200))
+            screen.blit(cont, (150, height / 2 - 100))
+            screen.blit(cont2, (150, height / 2))
+        elif player1.dtrigger:
+            victory = font.render('Второй игрок победил!', False, pygame.Color('white'))
+            cont = font.render('Нажмите "ESC", чтобы выйти', False,
+                               pygame.Color('white'))
+            cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
+                                pygame.Color('white'))
+            screen.blit(victory, (150, height / 2 - 200))
+            screen.blit(cont, (150, height / 2 - 100))
+            screen.blit(cont2, (150, height / 2))
         clock.tick(60)
         pygame.draw.rect(screen, pygame.Color('white'), (width // 2 - 1, 0, 5, height))
         pygame.display.flip()
