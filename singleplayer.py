@@ -3,7 +3,6 @@ import random
 from classes import *
 from images import BG, PLAYER_SHIP
 from spawn_enemies import *
-import CosmoRangers
 import pygame
 
 pygame.font.init()
@@ -69,7 +68,8 @@ def main():
 
         # draw a player
         player.draw(screen)
-
+        screen.blit(lives_label, (10, 10))
+        screen.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
         pygame.display.update()
 
     while running:
