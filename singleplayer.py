@@ -161,6 +161,8 @@ def main():
         draw_screen()
         clock.tick(60)
     pygame.quit()
+    from CosmoRangers import start
+    start(1)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,6 @@
 
 import os
 import sys
-
 import pygame
 
 pygame.init()
@@ -32,6 +31,7 @@ def terminate():
 
 
 all_sprites = pygame.sprite.Group()
+font = pygame.font.Font('Assets/SpaceFont.ttf', 40)
 
 
 class Player(pygame.sprite.Sprite):
@@ -230,9 +230,8 @@ def collide(shot, ship) -> bool:
 
 def vs():
     size = width, height = 1000, 600
-    font = pygame.font.Font('Assets/SpaceFont.ttf', 40)
     screen = pygame.display.set_mode(size)
-    pygame.display.set_caption("VS Mode Test")
+    pygame.display.set_caption("CosmoRangers VS Mode")
     background = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')),
                                         (width, height))
     global horizontal_borders
@@ -328,10 +327,16 @@ def vs():
         all_sprites.draw(screen)
         screen.blit(p1hp, (20, 10))
         screen.blit(p2hp, (680, 10))
+        if player1.dtrigger:
+            victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
+            cont = font.render('Нажмите "ESC", чтобы выйти\nНажмите "R", чтобы перезапустить', False,
+                               pygame.Color('white'))
         clock.tick(60)
         pygame.draw.rect(screen, pygame.Color('white'), (width // 2 - 1, 0, 5, height))
         pygame.display.flip()
     pygame.quit()
+    from CosmoRangers import start
+    start(1)
 
 
 if __name__ == '__main__':
