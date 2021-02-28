@@ -5,7 +5,6 @@ from images import BG, PLAYER_SHIP
 from spawn_enemies import *
 import pygame
 
-pygame.font.init()
 
 WIDTH = 700
 HEIGHT = 900
@@ -18,24 +17,27 @@ def collide(bullet, ship) -> bool:
 
 def main():
     pygame.init()
+    pygame.font.init()
     pygame.display.set_caption('SinglePlayer')
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
     player = Player(300, 600, PLAYER_SHIP, 4, 1, (94, 100))
     running = True
     level = 0
-    lives = 5
+    lives = 1
     wave = 3
     enemies = []
     enemy_bullets = []
 
     player_speed = 7
     enemy_speed = 1
+    alive = True
 
     enemy_bullet_speed = -4
 
     main_font = pygame.font.SysFont('comicsans', 50)
     pause_font = pygame.font.SysFont('comicsans', 200)
+    death_font = pygame.font.SysFont('comicsans', 120)
 
     paused = False
     clock = pygame.time.Clock()
@@ -82,7 +84,7 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     paused = not paused
-        if not paused:
+        if not paused and alive:
             if len(enemies) == 0:
                 level += 1
                 wave += 4
@@ -161,12 +163,22 @@ def main():
                 # shoot
                 if not random.randrange(0, 1000):
                     e.shoot_(enemy_bullets)
+            if lives <= 0:
+                alive = False
             draw_screen()
             clock.tick(60)
-        elif paused:
+        elif not alive:
+            death_label = death_font.render('Вы проиграли', 1, (255, 255, 255))
+            screen.blit(death_label,
+                        (WIDTH // 2 - death_label.get_width() // 2, HEIGHT // 2 - death_label.get_height() // 2))
+            pygame.display.update()
+            pygame.time.wait(3000)
+            main()
+        elif paused and alive:
             pause_label = pause_font.render('Пауза', 1, (255, 255, 255))
             screen.blit(pause_label, (WIDTH // 2 - pause_label.get_width() // 2, HEIGHT // 2 - pause_label.get_height() // 2))
             pygame.display.update()
+
     pygame.quit()
     from CosmoRangers import start
     start(1)
