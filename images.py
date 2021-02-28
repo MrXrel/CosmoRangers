@@ -3,6 +3,7 @@ import os
 
 WIDTH = 700
 HEIGHT = 900
+TIME = 1 * 10 ** 10
 
 # background
 BG = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background-black.png')), (WIDTH, HEIGHT))

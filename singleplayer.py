@@ -35,7 +35,9 @@ def main():
     enemy_bullet_speed = -4
 
     main_font = pygame.font.SysFont('comicsans', 50)
+    pause_font = pygame.font.SysFont('comicsans', 200)
 
+    paused = False
     clock = pygame.time.Clock()
 
     def draw_screen():
@@ -77,89 +79,94 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                # pygame.quit()
-                # CosmoRangers.start()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    paused = not paused
+        if not paused:
+            if len(enemies) == 0:
+                level += 1
+                wave += 4
+                # spawn enemies
+                enemies = spawn_enemies(wave, enemy_bullet_speed)
 
-        if len(enemies) == 0:
-            level += 1
-            wave += 4
-            # spawn enemies
-            enemies = spawn_enemies(wave, enemy_bullet_speed)
+            # get all pressed keys
+            key_pressed = pygame.key.get_pressed()
+            # up
+            if key_pressed[pygame.K_w] and player.get_height() + player_speed - 5 >= 0:
+                player.y -= player_speed
+            # down
+            if key_pressed[pygame.K_s] and player.get_height() + player_speed + player.img.get_height() <= HEIGHT:
+                player.y += player_speed
+            # left
+            if key_pressed[pygame.K_a] and player.get_width() + player_speed - 5 >= 0:
+                player.x -= player_speed
+            # right
+            if key_pressed[pygame.K_d] and player.get_width() + player_speed + player.img.get_width() <= WIDTH:
+                player.x += player_speed
 
-        # get all pressed keys
-        key_pressed = pygame.key.get_pressed()
-        # up
-        if key_pressed[pygame.K_w] and player.get_height() + player_speed - 5 >= 0:
-            player.y -= player_speed
-        # down
-        if key_pressed[pygame.K_s] and player.get_height() + player_speed + player.img.get_height() <= HEIGHT:
-            player.y += player_speed
-        # left
-        if key_pressed[pygame.K_a] and player.get_width() + player_speed - 5 >= 0:
-            player.x -= player_speed
-        # right
-        if key_pressed[pygame.K_d] and player.get_width() + player_speed + player.img.get_width() <= WIDTH:
-            player.x += player_speed
+            # if key_pressed[pygame.K_SPACE]:
+            #     if level >= 10:
+            #         player.advanced_shoot()
+            #     else:
+            #         player.shoot()
 
-        # if key_pressed[pygame.K_SPACE]:
-        #     if level >= 10:
-        #         player.advanced_shoot()
-        #     else:
-        #         player.shoot()
+            if level >= 15:
+                player.advanced_shoot(size=(20, 55))
+            else:
+                player.shoot(size=(20, 55))
 
-        if level >= 15:
-            player.advanced_shoot(size=(20, 55))
-        else:
-            player.shoot(size=(20, 55))
-
-        # move bullets
-        for b in player.bullets[:]:
-            b.move()
-            # check if bullets is out of the screen
-            if b.y + b.img.get_height() <= 0:
-                player.bullets.remove(b)
-
-        # move enemy bullets
-        for b in enemy_bullets[:]:
-            b.move()
-            # if bullet catch the player
-            if collide(b, player):
-                enemy_bullets.remove(b)
-                lives -= 1
-            # delete bullet if it's out of the screen
-            if b.y - b.img.get_height() >= HEIGHT:
-                enemy_bullets.remove(b)
-
-        # check if bullet catch the enemy
-        for enemy in enemies[:]:
+            # move bullets
             for b in player.bullets[:]:
-                # if catch
-                if collide(b, enemy):
+                b.move()
+                # check if bullets is out of the screen
+                if b.y + b.img.get_height() <= 0:
+                    player.bullets.remove(b)
+
+            # move enemy bullets
+            for b in enemy_bullets[:]:
+                b.move()
+                # if bullet catch the player
+                if collide(b, player):
+                    enemy_bullets.remove(b)
+                    lives -= 1
+                # delete bullet if it's out of the screen
+                if b.y - b.img.get_height() >= HEIGHT:
+                    enemy_bullets.remove(b)
+
+            # check if bullet catch the enemy
+            for enemy in enemies[:]:
+                for b in player.bullets[:]:
+                    # if catch
+                    if collide(b, enemy):
+                        try:
+                            enemies.remove(enemy)
+                            player.bullets.remove(b)
+                        except ValueError:
+                            pass
+                # check if enemy touch the player
+                if collide(enemy, player):
                     try:
                         enemies.remove(enemy)
-                        player.bullets.remove(b)
+                        lives -= 1
                     except ValueError:
                         pass
-            # check if enemy touch the player
-            if collide(enemy, player):
-                try:
-                    enemies.remove(enemy)
-                    lives -= 1
-                except ValueError:
-                    pass
 
-        # move enemies
-        for e in enemies[:]:
-            e.move(enemy_speed)
-            # check if they touch the screen
-            if e.y + e.img.get_height() >= HEIGHT:
-                enemies.remove(e)
-                lives -= 1
-            # shoot
-            if not random.randrange(0, 1000):
-                e.shoot_(enemy_bullets)
-        draw_screen()
-        clock.tick(60)
+            # move enemies
+            for e in enemies[:]:
+                e.move(enemy_speed)
+                # check if they touch the screen
+                if e.y + e.img.get_height() >= HEIGHT:
+                    enemies.remove(e)
+                    lives -= 1
+                # shoot
+                if not random.randrange(0, 1000):
+                    e.shoot_(enemy_bullets)
+            draw_screen()
+            clock.tick(60)
+        elif paused:
+            pause_label = pause_font.render('Пауза', 1, (255, 255, 255))
+            screen.blit(pause_label, (WIDTH // 2 - pause_label.get_width() // 2, HEIGHT // 2 - pause_label.get_height() // 2))
+            pygame.display.update()
     pygame.quit()
     from CosmoRangers import start
     start(1)
