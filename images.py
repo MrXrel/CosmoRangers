@@ -21,7 +21,7 @@ BLUE_SMALL_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'B
 RED_SMALL_SHIP = pygame.image.load(os.path.join('Assets', 'Ships', 'Flying', 'REDFALCONSHEET1.png'))
 
 # Bullets
-YELLOW_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_yellow.png'))
-BLUE_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_blue.png'))
-RED_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_red.png'))
-GREEN_BULLET = pygame.image.load(os.path.join('Assets', 'pixel_laser_green.png'))
+BLUE_BULLET = pygame.image.load(os.path.join('Assets', 'projectiles', 'rockets', 'BLUESMALLROCKET1.png'))
+RED_BULLET = pygame.image.load(os.path.join('Assets', 'projectiles', 'rockets', 'REDSMALLROCKET1.png'))
+PURPLE_BULLET = pygame.image.load(os.path.join('Assets', 'projectiles', 'rockets', 'PURPLESMALLROCKET1.png'))
+YELLOW_BULLET = pygame.image.load(os.path.join('Assets', 'projectiles', 'rockets', 'WHITEBIGROCKET1.png'))

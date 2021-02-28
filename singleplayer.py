@@ -3,7 +3,7 @@ import random
 from classes import *
 from images import BG, PLAYER_SHIP
 from spawn_enemies import *
-
+import CosmoRangers
 import pygame
 
 pygame.font.init()
@@ -59,10 +59,12 @@ def main():
         player.update_sprite()
         # draw bullets
         for b in player.bullets:
+            b.update_sprite()
             b.draw(screen)
 
         # draw enemy bullets
         for b in enemy_bullets:
+            b.update_sprite()
             b.draw(screen)
 
         # draw a player
@@ -75,6 +77,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                # pygame.quit()
+                # CosmoRangers.start()
 
         if len(enemies) == 0:
             level += 1
@@ -104,9 +108,9 @@ def main():
         #         player.shoot()
 
         if level >= 10:
-            player.advanced_shoot()
+            player.advanced_shoot(size=(20, 55))
         else:
-            player.shoot()
+            player.shoot(size=(20, 55))
 
         # move bullets
         for b in player.bullets[:]:
@@ -122,9 +126,8 @@ def main():
             if collide(b, player):
                 enemy_bullets.remove(b)
                 lives -= 1
-            # if out of the screen
+            # delete bullet if it's out of the screen
             if b.y - b.img.get_height() >= HEIGHT:
-                print('b')
                 enemy_bullets.remove(b)
 
         # check if bullet catch the enemy

@@ -4,11 +4,17 @@ import pygame
 all_sprites = pygame.sprite.Group()
 
 
-class Bullet:
-    def __init__(self, x, y, img, speed=4):
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y, sheet, columns, rows, speed=4, size=(18, 49)):
+        super().__init__(all_sprites)
+        self.frames = []
+        self.img = sheet
+        self.sheet = sheet
+        self.cut_sheet(self.sheet, columns, rows)
+        self.size = size
+        self.cur_frame = 0
         self.x = x
         self.y = y
-        self.img = img
         self.speed = speed
         self.mask = pygame.mask.from_surface(self.img)
 
@@ -18,6 +24,19 @@ class Bullet:
     def move(self):
         self.y -= self.speed
 
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update_sprite(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.img = pygame.transform.scale(self.frames[self.cur_frame], self.size)
+        self.mask = pygame.mask.from_surface(self.img)
     # def collide_with(self, other):
     #     return self.img.get_rect().colliderect(other.img.get_rect())
 
@@ -48,9 +67,9 @@ class Ship(pygame.sprite.Sprite):
         # draw a ship
         screen.blit(self.img, (self.x, self.y))
 
-    def shoot(self):
+    def shoot(self, size=(10, 49)):
         if self.reload == 0:
-            bullet = Bullet(self.x, self.y - self.img.get_height() + 20, self.bullet_img)
+            bullet = Bullet(self.x + self.size[0] // 2 - 10, self.y, self.bullet_img, 4, 1, size=size)
             self.bullets.append(bullet)
             self.reload = 1
 
@@ -59,7 +78,7 @@ class Ship(pygame.sprite.Sprite):
         if self.reload != 0:
             self.reload += 1
         # if reload > 30, it half a second has passed
-        if self.reload > 25:
+        if self.reload > 30:
             self.reload = 0
 
     def get_height(self):
@@ -90,10 +109,10 @@ class Player(Ship):
         self.bullet_img = YELLOW_BULLET
         self.mask = pygame.mask.from_surface(self.img)
 
-    def advanced_shoot(self):
+    def advanced_shoot(self, size):
         if self.reload == 0:
-            bullet = Bullet(self.x + 10, self.y - self.img.get_height() + 20, self.bullet_img)
-            bullet2 = Bullet(self.x - 10, self.y - self.img.get_height() + 20, self.bullet_img)
+            bullet = Bullet((self.x + self.size[0] // 2) - self.size[0] // 2 // 2, self.y, self.bullet_img, 4, 1, size=size)
+            bullet2 = Bullet(self.x + self.size[0] // 2, self.y, self.bullet_img, 4, 1, size=size)
             self.bullets.append(bullet)
             self.bullets.append(bullet2)
             self.reload = 1
@@ -118,7 +137,8 @@ class Enemy(Ship):
         if self.y + self.img.get_height() >= 1:
             if self.reload == 0:
                 # TODO right shoot animation from center of the bot
-                bullet = Bullet(self.x + (self.img.get_width() // 2), self.y + self.img.get_height(), self.bullet_img, self.speed)
+                bullet = Bullet(self.x + (self.size[0] // 2) - 5, self.y + self.size[1], self.bullet_img,
+                                4, 1, self.speed)
                 enemy_bullets.append(bullet)
                 self.reload = 1
 
