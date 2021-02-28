@@ -107,7 +107,7 @@ def main():
         #     else:
         #         player.shoot()
 
-        if level >= 10:
+        if level >= 15:
             player.advanced_shoot(size=(20, 55))
         else:
             player.shoot(size=(20, 55))

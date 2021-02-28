@@ -6,6 +6,7 @@ import sys
 import pygame
 
 pygame.init()
+pygame.font.init()
 
 
 def load_image(name, colorkey=-1):
@@ -229,6 +230,10 @@ def collide(shot, ship) -> bool:
 
 
 def vs():
+    pygame.init()
+    all_sprites = pygame.sprite.Group()
+    font = pygame.font.Font('Assets/SpaceFont.ttf', 40)
+
     size = width, height = 1000, 600
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("CosmoRangers VS Mode")
