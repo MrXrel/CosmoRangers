@@ -9,6 +9,7 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
+
 def load_image(name, colorkey=-1):
     fullname = os.path.join('Assets', name)
     # если файл не существует, то выходим
