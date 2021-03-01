@@ -9,6 +9,7 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
+
 def load_image(name, colorkey=-1):
     fullname = os.path.join('Assets', name)
     # если файл не существует, то выходим
@@ -134,7 +135,7 @@ class Player(pygame.sprite.Sprite):
             if self.num == 1:
                 bang = Rocket(self.x + 20, self.y - self.image.get_height() + 82, self.rocketim, speed, 4, 1, 90)
             elif self.num == 2:
-                bang = Rocket(self.x - 100, self.y - self.image.get_height() + 82, self.rocketim, speed, 4, 1, 270)
+                bang = Rocket(self.x - 80, self.y - self.image.get_height() + 82, self.rocketim, speed, 4, 1, 270)
             self.shots.append(bang)
             self.cooldown = 1
 
@@ -235,8 +236,14 @@ def collide(shot, ship, num) -> bool:
 
 def vs():
     pygame.init()
-    pygame.mixer.music.load('Assets/DamageSound.wav')
+    pygame.mixer.init()
+    pygame.mixer.music.load('Assets/VS Music.wav')
     pygame.mixer.music.set_volume(0.25)
+    pygame.mixer.music.play(-1)
+    dam = pygame.mixer.Sound('Assets/DamageSound.wav')
+    death = pygame.mixer.Sound('Assets/DeathSound.wav')
+    dam.set_volume(0.15)
+    death.set_volume(0.15)
     all_sprites = pygame.sprite.Group()
     font = pygame.font.Font('Assets/SpaceFont.ttf', 40)
     size = width, height = 1000, 600
@@ -315,9 +322,10 @@ def vs():
                 player2.health -= player1.damage
                 if player2.health > 0:
                     player2.hit('Ships/Damage/REDVOYAGERDAMAGE.png', 4, 1)
-                    pygame.mixer.music.play(1)
+                    dam.play()
                 else:
                     player2.death('Ships/Death/REDVOYAGERDEATH.png', 4, 3)
+                    death.play()
             if shot.x - shot.image.get_width() >= width:
                 player1.shots.remove(shot)
         for shot in player2.shots:
@@ -328,9 +336,10 @@ def vs():
                 player1.health -= player2.damage
                 if player1.health > 0:
                     player1.hit('Ships/Damage/BLUEVOYAGERDAMAGE.png', 4, 1)
-                    pygame.mixer.music.play(1)
+                    dam.play()
                 else:
                     player1.death('Ships/Death/BLUEVOYAGERDEATH.png', 4, 3)
+                    death.play()
             if shot.x - shot.image.get_width() == 0:
                 player2.shots.remove(shot)
         player1.reset_reload()
@@ -366,6 +375,9 @@ def vs():
         clock.tick(60)
         pygame.display.flip()
     pygame.quit()
+    pygame.mixer.init()
+    pygame.mixer.music.stop()
+    pygame.mixer.music.unload()
     from CosmoRangers import start
     start(1)
 

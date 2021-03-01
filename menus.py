@@ -2,6 +2,7 @@ import arcade
 from arcade.gui import UIManager
 from singleplayer import main
 from VSMode import vs
+import pygame
 
 
 WIDTH = 700
@@ -14,9 +15,9 @@ class Title(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_text("CosmoRangers", WIDTH / 2, HEIGHT / 2, arcade.color.CADET_BLUE,
+        arcade.draw_text("CosmoRangers", WIDTH / 2, HEIGHT / 2, arcade.color.BLUE,
                          font_size=42, anchor_x='center')
-        arcade.draw_text("Press Enter", WIDTH / 2, HEIGHT / 2 - 50, arcade.color.AMAZON,
+        arcade.draw_text("Press Enter", WIDTH / 2, HEIGHT / 2 - 50, arcade.color.LIGHT_SKY_BLUE,
                          font_size=21, anchor_x='center')
 
     def on_key_press(self, symbol: int, modifiers: int):
@@ -28,6 +29,8 @@ class Title(arcade.View):
 class Menu(arcade.View):
     def __init__(self):
         super(Menu, self).__init__()
+        pygame.init()
+        pygame.mixer.init()
         self.ui = UIManager(self.window)
         self.setup()
 
@@ -51,6 +54,8 @@ class Menu(arcade.View):
 
     def arcstart(self):
         arcade.close_window()
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
         try:
             scene = main()
             self.window.show_view(scene)
@@ -59,6 +64,8 @@ class Menu(arcade.View):
 
     def vsstart(self):
         arcade.close_window()
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
         try:
             scene = vs()
             self.window.show_view(scene)
@@ -66,6 +73,8 @@ class Menu(arcade.View):
             pass
 
     def exit(self):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
         arcade.close_window()
 
     def on_show(self):

@@ -212,6 +212,9 @@ def main():
             pygame.mixer.music.pause()
 
     pygame.quit()
+    pygame.mixer.init()
+    pygame.mixer.music.stop()
+    pygame.mixer.music.unload()
     from CosmoRangers import start
     start(1)
 
