@@ -7,7 +7,7 @@ import pygame
 
 pygame.init()
 pygame.font.init()
-
+pygame.mixer.init()
 
 def load_image(name, colorkey=-1):
     fullname = os.path.join('Assets', name)
@@ -141,7 +141,7 @@ class Player(pygame.sprite.Sprite):
     def reset_reload(self):
         if self.cooldown != 0:
             self.cooldown += 1
-        if self.cooldown > 15:
+        if self.cooldown > 30:
             self.cooldown = 0
 
     def get_height(self):
@@ -235,9 +235,10 @@ def collide(shot, ship, num) -> bool:
 
 def vs():
     pygame.init()
+    pygame.mixer.music.load('Assets/DamageSound.wav')
+    pygame.mixer.music.set_volume(0.25)
     all_sprites = pygame.sprite.Group()
     font = pygame.font.Font('Assets/SpaceFont.ttf', 40)
-
     size = width, height = 1000, 600
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("CosmoRangers VS Mode")
@@ -246,7 +247,7 @@ def vs():
     global horizontal_borders
     global vertical_borders
     player1 = Player('Ships/Flying/BLUEVOYAGERSHEET.png', 25, height // 2 - 50, 1, 4, 1)
-    player2 = Player('Ships/Flying/REDVOYAGERSHEET.png', width - 25, height // 2 - 50, 2, 4, 1)
+    player2 = Player('Ships/Flying/REDVOYAGERSHEET.png', width - 5, height // 2 - 50, 2, 4, 1)
     all_sprites.add(player1)
     all_sprites.add(player2)
     horizontal_borders = pygame.sprite.Group()
@@ -261,7 +262,7 @@ def vs():
     all_sprites.add(center2)
     clock = pygame.time.Clock()
     player_speed = 3
-    rocket_speed = 5
+    rocket_speed = 4
     running = True
     while running:
         for event in pygame.event.get():
@@ -314,6 +315,7 @@ def vs():
                 player2.health -= player1.damage
                 if player2.health > 0:
                     player2.hit('Ships/Damage/REDVOYAGERDAMAGE.png', 4, 1)
+                    pygame.mixer.music.play(1)
                 else:
                     player2.death('Ships/Death/REDVOYAGERDEATH.png', 4, 3)
             if shot.x - shot.image.get_width() >= width:
@@ -326,6 +328,7 @@ def vs():
                 player1.health -= player2.damage
                 if player1.health > 0:
                     player1.hit('Ships/Damage/BLUEVOYAGERDAMAGE.png', 4, 1)
+                    pygame.mixer.music.play(1)
                 else:
                     player1.death('Ships/Death/BLUEVOYAGERDEATH.png', 4, 3)
             if shot.x - shot.image.get_width() == 0:
@@ -340,7 +343,7 @@ def vs():
         player2.framechange()
         all_sprites.draw(screen)
         screen.blit(p1hp, (20, 10))
-        screen.blit(p2hp, (550, 10))
+        screen.blit(p2hp, (575, 10))
         pygame.draw.rect(screen, pygame.Color('dark blue'), (width // 2 - 1, 0, 5, height))
         if player2.dtrigger:
             victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
@@ -349,8 +352,8 @@ def vs():
             cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
                                pygame.Color('white'))
             screen.blit(victory, (150, height / 2 - 200))
-            screen.blit(cont, (150, height / 2 - 100))
-            screen.blit(cont2, (150, height / 2))
+            screen.blit(cont, (100, height / 2 - 100))
+            screen.blit(cont2, (20, height / 2))
         elif player1.dtrigger:
             victory = font.render('Второй игрок победил!', False, pygame.Color('white'))
             cont = font.render('Нажмите "ESC", чтобы выйти', False,
@@ -358,9 +361,9 @@ def vs():
             cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
                                 pygame.Color('white'))
             screen.blit(victory, (150, height / 2 - 200))
-            screen.blit(cont, (150, height / 2 - 100))
-            screen.blit(cont2, (150, height / 2))
-        clock.tick(30)
+            screen.blit(cont, (100, height / 2 - 100))
+            screen.blit(cont2, (20, height / 2))
+        clock.tick(60)
         pygame.display.flip()
     pygame.quit()
     from CosmoRangers import start

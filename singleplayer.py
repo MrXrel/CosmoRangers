@@ -18,7 +18,13 @@ def collide(bullet, ship) -> bool:
 def main():
     pygame.init()
     pygame.font.init()
-    pygame.display.set_caption('SinglePlayer')
+    pygame.mixer.init()
+
+    pygame.mixer.music.load('Assets/soundtrack.mp3')
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.09)
+
+    pygame.display.set_caption('CosmoRangers Arcade Mode')
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
     player = Player(300, 600, PLAYER_SHIP, 4, 1, (94, 100))
@@ -108,16 +114,16 @@ def main():
             if key_pressed[pygame.K_d] and player.get_width() + player_speed + player.img.get_width() <= WIDTH:
                 player.x += player_speed
 
-            # if key_pressed[pygame.K_SPACE]:
-            #     if level >= 10:
-            #         player.advanced_shoot()
-            #     else:
-            #         player.shoot()
+            if key_pressed[pygame.K_SPACE]:
+                if level >= 10:
+                    player.advanced_shoot(size=(20, 55))
+                else:
+                    player.shoot(size=(20, 55))
 
-            if level >= 15:
-                player.advanced_shoot(size=(20, 55))
-            else:
-                player.shoot(size=(20, 55))
+            # if level >= 15:
+            #     player.advanced_shoot(size=(20, 55))
+            # else:
+            #     player.shoot(size=(20, 55))
 
             # move bullets
             for b in player.bullets[:]:
@@ -167,14 +173,20 @@ def main():
                     e.shoot_(enemy_bullets)
             if lives <= 0:
                 alive = False
+
             draw_screen()
             clock.tick(60)
+
+            if not pygame.mixer.get_busy():
+                pygame.mixer.music.unpause()
 
         elif not alive:
             death_label = death_font.render('Вы проиграли', 1, (255, 255, 255))
             screen.blit(death_label,
                         (WIDTH // 2 - death_label.get_width() // 2, HEIGHT // 2 - death_label.get_height() // 2))
             pygame.display.update()
+            pygame.mixer.music.pause()
+
             pygame.time.wait(3000)
             main()
             
@@ -182,6 +194,7 @@ def main():
             pause_label = pause_font.render('Пауза', 1, (255, 255, 255))
             screen.blit(pause_label, (WIDTH // 2 - pause_label.get_width() // 2, HEIGHT // 2 - pause_label.get_height() // 2))
             pygame.display.update()
+            pygame.mixer.music.pause()
 
     pygame.quit()
     from CosmoRangers import start
