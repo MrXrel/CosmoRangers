@@ -9,6 +9,7 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
+
 def load_image(name, colorkey=-1):
     fullname = os.path.join('Assets', name)
     # если файл не существует, то выходим
@@ -235,8 +236,14 @@ def collide(shot, ship, num) -> bool:
 
 def vs():
     pygame.init()
-    pygame.mixer.music.load('Assets/DamageSound.wav')
+    pygame.mixer.init()
+    pygame.mixer.music.load('Assets/VS Music.wav')
     pygame.mixer.music.set_volume(0.25)
+    pygame.mixer.music.play(-1)
+    dam = pygame.mixer.Sound('Assets/DamageSound.wav')
+    death = pygame.mixer.Sound('Assets/DeathSound.wav')
+    dam.set_volume(0.15)
+    death.set_volume(0.15)
     all_sprites = pygame.sprite.Group()
     font = pygame.font.Font('Assets/SpaceFont.ttf', 40)
     size = width, height = 1000, 600
@@ -264,108 +271,129 @@ def vs():
     player_speed = 3
     rocket_speed = 4
     running = True
+    pause = False
     while running:
+        screen.blit(background, (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pause = not pause
         keypress = pygame.key.get_pressed()
-        if not player1.dtrigger:
-            if keypress[pygame.K_w]:
-                newy = -player_speed
-                player1.update(0, newy)
-            if keypress[pygame.K_s]:
-                newy = player_speed
-                player1.update(0, newy)
-            if keypress[pygame.K_d]:
-                newx = player_speed
-                player1.update(newx, 0)
-            if keypress[pygame.K_a]:
-                newx = -player_speed
-                player1.update(newx, 0)
-            if keypress[pygame.K_SPACE]:
-                player1.shoot(rocket_speed)
-        if not player2.dtrigger:
-            if keypress[pygame.K_UP]:
-                newy = -player_speed
-                player2.update(0, newy)
-            if keypress[pygame.K_DOWN]:
-                newy = player_speed
-                player2.update(0, newy)
-            if keypress[pygame.K_RIGHT]:
-                newx = player_speed
-                player2.update(newx, 0)
-            if keypress[pygame.K_LEFT]:
-                newx = -player_speed
-                player2.update(newx, 0)
-            if keypress[pygame.K_RCTRL]:
-                player2.shoot(-rocket_speed)
-        if player1.dtrigger or player2.dtrigger:
-            if keypress[pygame.K_ESCAPE]:
-                running = False
-            if keypress[pygame.K_r]:
-                vs()
-        screen.blit(background, (0, 0))
-        p1hp = font.render(f"Здоровье: {player1.health}", False, pygame.Color('white'))
-        p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
-        for shot in player1.shots:
-            shot.move()
-            shot.framechange()
-            if collide(shot, player2, 1):
-                player1.shots.remove(shot)
-                player2.health -= player1.damage
-                if player2.health > 0:
-                    player2.hit('Ships/Damage/REDVOYAGERDAMAGE.png', 4, 1)
-                    pygame.mixer.music.play(1)
-                else:
-                    player2.death('Ships/Death/REDVOYAGERDEATH.png', 4, 3)
-            if shot.x - shot.image.get_width() >= width:
-                player1.shots.remove(shot)
-        for shot in player2.shots:
-            shot.move()
-            shot.framechange()
-            if collide(shot, player1, 2):
-                player2.shots.remove(shot)
-                player1.health -= player2.damage
-                if player1.health > 0:
-                    player1.hit('Ships/Damage/BLUEVOYAGERDAMAGE.png', 4, 1)
-                    pygame.mixer.music.play(1)
-                else:
-                    player1.death('Ships/Death/BLUEVOYAGERDEATH.png', 4, 3)
-            if shot.x - shot.image.get_width() == 0:
-                player2.shots.remove(shot)
-        player1.reset_reload()
-        player2.reset_reload()
-        for shot in player1.shots:
-            shot.draw(screen)
-        for shot in player2.shots:
-            shot.draw(screen)
-        player1.framechange()
-        player2.framechange()
-        all_sprites.draw(screen)
-        screen.blit(p1hp, (20, 10))
-        screen.blit(p2hp, (575, 10))
-        pygame.draw.rect(screen, pygame.Color('dark blue'), (width // 2 - 1, 0, 5, height))
-        if player2.dtrigger:
-            victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
-            cont = font.render('Нажмите "ESC", чтобы выйти', False,
-                               pygame.Color('white'))
-            cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
-                               pygame.Color('white'))
-            screen.blit(victory, (150, height / 2 - 200))
-            screen.blit(cont, (100, height / 2 - 100))
-            screen.blit(cont2, (20, height / 2))
-        elif player1.dtrigger:
-            victory = font.render('Второй игрок победил!', False, pygame.Color('white'))
-            cont = font.render('Нажмите "ESC", чтобы выйти', False,
-                               pygame.Color('white'))
-            cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
-                                pygame.Color('white'))
-            screen.blit(victory, (150, height / 2 - 200))
-            screen.blit(cont, (100, height / 2 - 100))
-            screen.blit(cont2, (20, height / 2))
-        clock.tick(60)
-        pygame.display.flip()
+        if not pause and not (player1.dtrigger or player2.dtrigger):
+            if not player1.dtrigger:
+                if keypress[pygame.K_w]:
+                    newy = -player_speed
+                    player1.update(0, newy)
+                if keypress[pygame.K_s]:
+                    newy = player_speed
+                    player1.update(0, newy)
+                if keypress[pygame.K_d]:
+                    newx = player_speed
+                    player1.update(newx, 0)
+                if keypress[pygame.K_a]:
+                    newx = -player_speed
+                    player1.update(newx, 0)
+                if keypress[pygame.K_SPACE]:
+                    player1.shoot(rocket_speed)
+            if not player2.dtrigger:
+                if keypress[pygame.K_UP]:
+                    newy = -player_speed
+                    player2.update(0, newy)
+                if keypress[pygame.K_DOWN]:
+                    newy = player_speed
+                    player2.update(0, newy)
+                if keypress[pygame.K_RIGHT]:
+                    newx = player_speed
+                    player2.update(newx, 0)
+                if keypress[pygame.K_LEFT]:
+                    newx = -player_speed
+                    player2.update(newx, 0)
+                if keypress[pygame.K_RCTRL]:
+                    player2.shoot(-rocket_speed)
+            if player1.dtrigger or player2.dtrigger:
+                if keypress[pygame.K_ESCAPE]:
+                    running = False
+                if keypress[pygame.K_r]:
+                    vs()
+            for shot in player1.shots:
+                shot.move()
+                shot.framechange()
+                if collide(shot, player2, 1):
+                    player1.shots.remove(shot)
+                    player2.health -= player1.damage
+                    if player2.health > 0:
+                        player2.hit('Ships/Damage/REDVOYAGERDAMAGE.png', 4, 1)
+                        dam.play()
+                    else:
+                        player2.death('Ships/Death/REDVOYAGERDEATH.png', 4, 3)
+                        death.play()
+                if shot.x - shot.image.get_width() >= width:
+                    player1.shots.remove(shot)
+            for shot in player2.shots:
+                shot.move()
+                shot.framechange()
+                if collide(shot, player1, 2):
+                    player2.shots.remove(shot)
+                    player1.health -= player2.damage
+                    if player1.health > 0:
+                        player1.hit('Ships/Damage/BLUEVOYAGERDAMAGE.png', 4, 1)
+                        dam.play()
+                    else:
+                        player1.death('Ships/Death/BLUEVOYAGERDEATH.png', 4, 3)
+                        death.play()
+                if shot.x - shot.image.get_width() == 0:
+                    player2.shots.remove(shot)
+                player1.reset_reload()
+                player2.reset_reload()
+            for shot in player1.shots:
+                shot.draw(screen)
+            for shot in player2.shots:
+                shot.draw(screen)
+            player1.framechange()
+            player2.framechange()
+            if not pygame.mixer.get_busy():
+                pygame.mixer.music.unpause()
+            p1hp = font.render(f"Здоровье: {player1.health}", False, pygame.Color('white'))
+            p2hp = font.render(f"Здоровье: {player2.health}", False, pygame.Color('white'))
+            all_sprites.draw(screen)
+            screen.blit(p1hp, (20, 10))
+            screen.blit(p2hp, (575, 10))
+            pygame.draw.rect(screen, pygame.Color('dark blue'), (width // 2 - 1, 0, 5, height))
+            if player2.dtrigger:
+                victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
+                cont = font.render('Нажмите "ESC", чтобы выйти', False,
+                                   pygame.Color('white'))
+                cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
+                                   pygame.Color('white'))
+                screen.blit(victory, (150, height / 2 - 200))
+                screen.blit(cont, (100, height / 2 - 100))
+                screen.blit(cont2, (20, height / 2))
+            elif player1.dtrigger:
+                victory = font.render('Второй игрок победил!', False, pygame.Color('white'))
+                cont = font.render('Нажмите "ESC", чтобы выйти', False,
+                                   pygame.Color('white'))
+                cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
+                                    pygame.Color('white'))
+                screen.blit(victory, (150, height / 2 - 200))
+                screen.blit(cont, (100, height / 2 - 100))
+                screen.blit(cont2, (20, height / 2))
+            clock.tick(60)
+            pygame.display.flip()
+        elif pause:
+            pygame.draw.rect(screen, pygame.Color('dark blue'), (width // 2 - 1, 0, 5, height))
+            all_sprites.draw(screen)
+            screen.blit(p1hp, (20, 10))
+            screen.blit(p2hp, (575, 10))
+            pausetext = font.render('Пауза', False, pygame.Color('white'))
+            screen.blit(pausetext, (width // 2 - pausetext.get_width() // 2, height // 2 - pausetext.get_height() // 2))
+            pygame.mixer.music.pause()
+            pygame.display.flip()
     pygame.quit()
+    pygame.mixer.init()
+    pygame.mixer.music.stop()
+    pygame.mixer.music.unload()
     from CosmoRangers import start
     start(1)
 
