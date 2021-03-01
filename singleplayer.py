@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import random
 
 from classes import *
@@ -95,6 +97,19 @@ def main():
         if not paused and alive:
             if len(enemies) == 0:
                 level += 1
+                text = 'Hаивысший счет в аркаде: {}'
+                try:
+                    with open('record.txt', 'r') as f:
+                        try:
+                            record = int(f.read().split()[4])
+                        except (ValueError, IndexError):
+                            record = 0
+                        if level > record:
+                            with open('record.txt', 'w') as f:
+                                f.write(text.format(str(level)))
+                except FileNotFoundError:
+                    with open('record.txt', 'w') as f:
+                        f.write(text.format(str(level)))
                 wave += 4
                 # spawn enemies
                 enemies = spawn_enemies(wave, enemy_bullet_speed)
