@@ -7,7 +7,7 @@ import pygame
 
 pygame.init()
 pygame.font.init()
-
+pygame.mixer.init()
 
 def load_image(name, colorkey=-1):
     fullname = os.path.join('Assets', name)
@@ -235,9 +235,10 @@ def collide(shot, ship, num) -> bool:
 
 def vs():
     pygame.init()
+    pygame.mixer.music.load('Assets/DamageSound.wav')
+    pygame.mixer.music.set_volume(0.25)
     all_sprites = pygame.sprite.Group()
     font = pygame.font.Font('Assets/SpaceFont.ttf', 40)
-
     size = width, height = 1000, 600
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("CosmoRangers VS Mode")
@@ -260,7 +261,7 @@ def vs():
     all_sprites.add(center1)
     all_sprites.add(center2)
     clock = pygame.time.Clock()
-    player_speed = 2
+    player_speed = 3
     rocket_speed = 4
     running = True
     while running:
@@ -314,6 +315,7 @@ def vs():
                 player2.health -= player1.damage
                 if player2.health > 0:
                     player2.hit('Ships/Damage/REDVOYAGERDAMAGE.png', 4, 1)
+                    pygame.mixer.music.play(1)
                 else:
                     player2.death('Ships/Death/REDVOYAGERDEATH.png', 4, 3)
             if shot.x - shot.image.get_width() >= width:
@@ -326,6 +328,7 @@ def vs():
                 player1.health -= player2.damage
                 if player1.health > 0:
                     player1.hit('Ships/Damage/BLUEVOYAGERDAMAGE.png', 4, 1)
+                    pygame.mixer.music.play(1)
                 else:
                     player1.death('Ships/Death/BLUEVOYAGERDEATH.png', 4, 3)
             if shot.x - shot.image.get_width() == 0:
