@@ -97,7 +97,7 @@ def main():
         if not paused and alive:
             if len(enemies) == 0:
                 level += 1
-                text = 'наивысший счет в аркаде: {}'
+                text = 'Hаивысший счет в аркаде: {}'
                 try:
                     with open('record.txt', 'r') as f:
                         try:
