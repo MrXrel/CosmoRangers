@@ -141,7 +141,7 @@ class Player(pygame.sprite.Sprite):
     def reset_reload(self):
         if self.cooldown != 0:
             self.cooldown += 1
-        if self.cooldown > 15:
+        if self.cooldown > 30:
             self.cooldown = 0
 
     def get_height(self):
@@ -246,7 +246,7 @@ def vs():
     global horizontal_borders
     global vertical_borders
     player1 = Player('Ships/Flying/BLUEVOYAGERSHEET.png', 25, height // 2 - 50, 1, 4, 1)
-    player2 = Player('Ships/Flying/REDVOYAGERSHEET.png', width - 25, height // 2 - 50, 2, 4, 1)
+    player2 = Player('Ships/Flying/REDVOYAGERSHEET.png', width - 5, height // 2 - 50, 2, 4, 1)
     all_sprites.add(player1)
     all_sprites.add(player2)
     horizontal_borders = pygame.sprite.Group()
@@ -260,8 +260,8 @@ def vs():
     all_sprites.add(center1)
     all_sprites.add(center2)
     clock = pygame.time.Clock()
-    player_speed = 3
-    rocket_speed = 5
+    player_speed = 2
+    rocket_speed = 4
     running = True
     while running:
         for event in pygame.event.get():
@@ -340,7 +340,7 @@ def vs():
         player2.framechange()
         all_sprites.draw(screen)
         screen.blit(p1hp, (20, 10))
-        screen.blit(p2hp, (550, 10))
+        screen.blit(p2hp, (575, 10))
         pygame.draw.rect(screen, pygame.Color('dark blue'), (width // 2 - 1, 0, 5, height))
         if player2.dtrigger:
             victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
@@ -349,8 +349,8 @@ def vs():
             cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
                                pygame.Color('white'))
             screen.blit(victory, (150, height / 2 - 200))
-            screen.blit(cont, (150, height / 2 - 100))
-            screen.blit(cont2, (150, height / 2))
+            screen.blit(cont, (100, height / 2 - 100))
+            screen.blit(cont2, (20, height / 2))
         elif player1.dtrigger:
             victory = font.render('Второй игрок победил!', False, pygame.Color('white'))
             cont = font.render('Нажмите "ESC", чтобы выйти', False,
@@ -358,9 +358,9 @@ def vs():
             cont2 = font.render('Нажмите "R", чтобы перезапустить', False,
                                 pygame.Color('white'))
             screen.blit(victory, (150, height / 2 - 200))
-            screen.blit(cont, (150, height / 2 - 100))
-            screen.blit(cont2, (150, height / 2))
-        clock.tick(30)
+            screen.blit(cont, (100, height / 2 - 100))
+            screen.blit(cont2, (20, height / 2))
+        clock.tick(60)
         pygame.display.flip()
     pygame.quit()
     from CosmoRangers import start

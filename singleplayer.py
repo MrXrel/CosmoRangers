@@ -24,7 +24,7 @@ def main():
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.09)
 
-    pygame.display.set_caption('SinglePlayer')
+    pygame.display.set_caption('CosmoRangers Arcade Mode')
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
     player = Player(300, 600, PLAYER_SHIP, 4, 1, (94, 100))
