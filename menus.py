@@ -15,9 +15,9 @@ class Title(arcade.View):
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text("CosmoRangers", WIDTH / 2, HEIGHT / 2, arcade.color.CADET_BLUE,
-                         font_size=42, anchor_x='center', font_name="Assets/SpaceFont.ttf")
+                         font_size=42, anchor_x='center')
         arcade.draw_text("Press Enter", WIDTH / 2, HEIGHT / 2 - 50, arcade.color.AMAZON,
-                         font_size=21, anchor_x='center', font_name="Assets/SpaceFont.ttf")
+                         font_size=21, anchor_x='center')
 
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.ENTER:
@@ -33,6 +33,9 @@ class Menu(arcade.View):
 
     def setup(self):
         self.ui.purge_ui_elements()
+        self.ui.add_ui_element(arcade.gui.UILabel(
+            'CosmoRangers', center_x=WIDTH / 2, center_y=800
+        ))
         arcbtn = arcade.gui.UIFlatButton(
             "Arcade Mode", center_x=WIDTH // 2, center_y=600, width=400)
         arcbtn.set_handler("on_click", self.arcstart)
@@ -70,5 +73,3 @@ class Menu(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_text("CosmoRangers", WIDTH / 2, 750, arcade.color.CADET_BLUE,
-                         font_size=50, anchor_x='center', font_name="Assets/SpaceFont.ttf")
