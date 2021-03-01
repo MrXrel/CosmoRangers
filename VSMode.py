@@ -58,7 +58,7 @@ class Player(pygame.sprite.Sprite):
         self.count = 0
         self.trigger = False
         self.dtrigger = False
-        self.image = pygame.transform.scale(self.image, [55, 114])
+        self.image = pygame.transform.scale(self.image, [60, 86])
         if self.num == 1:
             self.rocketim = 'Projectiles/Rockets/BLUESMALLROCKET.png'
             self.image = pygame.transform.rotate(self.image, 90)
@@ -117,11 +117,11 @@ class Player(pygame.sprite.Sprite):
             self.kill()
         self.image = self.frames[self.spritecur]
         if not self.dtrigger:
-            self.image = pygame.transform.scale(self.image, [55, 97])
+            self.image = pygame.transform.scale(self.image, [60, 86])
         else:
             self.image = pygame.transform.scale(self.image, [141, 150])
             if self.spritecur == 0:
-                self.rect.center = self.rect.centerx - 20, self.y - 18
+                self.rect.center = self.rect.centerx - 20, self.y
         self.spritecur = (self.spritecur + 1) % len(self.frames)
         if self.num == 1:
             self.image = pygame.transform.rotate(self.image, 90)
@@ -132,9 +132,9 @@ class Player(pygame.sprite.Sprite):
     def shoot(self, speed):
         if self.cooldown == 0:
             if self.num == 1:
-                bang = Rocket(self.x + 20, self.y - self.image.get_height() + 72, self.rocketim, speed, 4, 1, 90)
+                bang = Rocket(self.x + 20, self.y - self.image.get_height() + 82, self.rocketim, speed, 4, 1, 90)
             elif self.num == 2:
-                bang = Rocket(self.x - 100, self.y - self.image.get_height() + 72, self.rocketim, speed, 4, 1, 270)
+                bang = Rocket(self.x - 100, self.y - self.image.get_height() + 82, self.rocketim, speed, 4, 1, 270)
             self.shots.append(bang)
             self.cooldown = 1
 
@@ -195,7 +195,7 @@ class Rocket:
         self.image = self.frames[self.spritecur]
         self.speed = speed
         self.rotate = degrees
-        self.image = pygame.transform.scale(self.image, [22, 62])
+        self.image = pygame.transform.scale(self.image, [17, 44])
         self.image = pygame.transform.rotate(self.image, self.rotate)
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -215,7 +215,7 @@ class Rocket:
     def framechange(self):
         self.image = self.frames[self.spritecur]
         self.spritecur = (self.spritecur + 1) % len(self.frames)
-        self.image = pygame.transform.scale(self.image, [22, 58])
+        self.image = pygame.transform.scale(self.image, [17, 44])
         self.image = pygame.transform.rotate(self.image, self.rotate)
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -226,8 +226,11 @@ class Rocket:
         return self.x
 
 
-def collide(shot, ship) -> bool:
-    return shot.mask.overlap(ship.mask, (shot.x - ship.x, shot.y - ship.y))
+def collide(shot, ship, num) -> bool:
+    if num == 1:
+        return shot.mask.overlap(ship.mask, (ship.x - shot.x - 70, ship.y - shot.y))
+    elif num == 2:
+        return shot.mask.overlap(ship.mask, (ship.x - shot.x, ship.y - shot.y))
 
 
 def vs():
@@ -251,9 +254,9 @@ def vs():
     Border(0, 0, width, 0)
     Border(0, height, width, height)
     Border(0, 0, 0, height)
-    Border(width + 20, 0, width + 20, height)
-    center1 = Border(width // 2, 0, width // 2, height)
-    center2 = Border(width // 2, 0, width // 2, height)
+    Border(width, 0, width, height)
+    center1 = Border(width // 2 - 1, 0, width // 2 - 1, height)
+    center2 = Border(width // 2 + 1, 0, width // 2 + 1, height)
     all_sprites.add(center1)
     all_sprites.add(center2)
     clock = pygame.time.Clock()
@@ -306,7 +309,7 @@ def vs():
         for shot in player1.shots:
             shot.move()
             shot.framechange()
-            if collide(shot, player2):
+            if collide(shot, player2, 1):
                 player1.shots.remove(shot)
                 player2.health -= player1.damage
                 if player2.health > 0:
@@ -318,7 +321,7 @@ def vs():
         for shot in player2.shots:
             shot.move()
             shot.framechange()
-            if collide(shot, player1):
+            if collide(shot, player1, 2):
                 player2.shots.remove(shot)
                 player1.health -= player2.damage
                 if player1.health > 0:
@@ -337,7 +340,7 @@ def vs():
         player2.framechange()
         all_sprites.draw(screen)
         screen.blit(p1hp, (20, 10))
-        screen.blit(p2hp, (680, 10))
+        screen.blit(p2hp, (550, 10))
         pygame.draw.rect(screen, pygame.Color('dark blue'), (width // 2 - 1, 0, 5, height))
         if player2.dtrigger:
             victory = font.render('Первый игрок победил!', False, pygame.Color('white'))
