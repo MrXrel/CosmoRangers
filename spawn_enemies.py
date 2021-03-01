@@ -23,3 +23,4 @@ def spawn_enemies(wave: int, enemy_bullet_speed: int) -> list:
                       enemy_bullet_speed, ship, 4, 1, ship[2])
         enemies.append(enemy)
     return enemies
+
